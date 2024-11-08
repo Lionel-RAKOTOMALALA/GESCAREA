@@ -12,6 +12,7 @@ import useFetchEmploye from 'hooks/employe.hook';
 import { useAuthStore } from 'store/store';
 import { getEmployeDetails } from 'helper/helper';
 import SupprConfirmModal from 'components/Modals/supprConfirmModal';
+import toast from 'react-hot-toast';
 
 
 const EmployeeTable = () => {
@@ -68,21 +69,52 @@ const EmployeeTable = () => {
         }
     };
 
-    const updateData = (rowId, columnId, newValue) => {
+    const updateDataInDatabase = async (employeeId, updatedField) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:8000/api/employes/${employeeId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                },
+                body: JSON.stringify(updatedField),
+            });
+
+            if (response.ok) {
+                toast({
+                    title: 'Employé modifié avec succès',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            } else {
+                throw new Error("Erreur lors de la modification de l'employé");
+            }
+        } catch (error) {
+            toast({
+                title: 'Erreur',
+                description: error.message,
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+    };
+
+    const handleCellUpdate = (rowId, columnId, newValue) => {
         setEmployees((prevEmployees) =>
             prevEmployees.map((emp) =>
                 emp.id_employe === rowId ? { ...emp, [columnId]: newValue } : emp
             )
         );
+
+        updateDataInDatabase(rowId, { [columnId]: newValue });
     };
 
-    const updateStatus = (rowId, newStatus) => {
-        setEmployees((prevEmployees) =>
-            prevEmployees.map((emp) =>
-                emp.id_employe === rowId ? { ...emp, statut: newStatus } : emp
-            )
-        );
-    };
+
 
     const handleViewModalClose = () => {
         setViewModalOpen(false);
@@ -150,103 +182,71 @@ const EmployeeTable = () => {
                                     <EditableCell
                                         value={employee.employe.nom}
                                         columnId="nom"
-                                        onChange={(columnId, newNom) => {
-                                            if (newNom) {
-                                                updateData(employee.id_employe, columnId, newNom);
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' fontWeight='bold' borderColor={borderColor}>
                                     <EditableCell
                                         value={employee.employe.prenom}
                                         columnId="prenom"
-                                        onChange={(columnId, newPrenom) => {
-                                            if (newPrenom) {
-                                                updateData(employee.id_employe, columnId, newPrenom);
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <DateCell
                                         value={employee.employe.date_naissance}
-                                        updateData={updateData}
                                         rowId={employee.id_employe}
                                         columnId="date_naissance"
+                                        onChange={(newDate) => handleCellUpdate(employee.id_employe, 'date_naissance', newDate)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
                                         value={"16"}
                                         columnId="age"
-                                        onChange={(columnId, newAge) => {
-                                            if (newAge) {
-                                                updateData(employee.id_employe, columnId, parseInt(newAge, 10));
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
                                         value={employee.employe.genre}
                                         columnId="genre"
-                                        onChange={(columnId, newGenre) => {
-                                            if (newGenre) {
-                                                updateData(employee.id_employe, columnId, newGenre);
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
                                         value={employee.employe.situation_matrimoniale}
                                         columnId="situation_matrimoniale"
-                                        onChange={(columnId, newSituation) => {
-                                            if (newSituation) {
-                                                updateData(employee.id_employe, columnId, newSituation);
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
                                         value={employee.employe.contact_personnel}
                                         columnId="contact_personnel"
-                                        onChange={(columnId, newContact) => {
-                                            if (newContact) {
-                                                updateData(employee.id_employe, columnId, newContact);
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
                                         value={employee.employe.email}
                                         columnId="email"
-                                        onChange={(columnId, newEmail) => {
-                                            if (newEmail) {
-                                                updateData(employee.id_employe, columnId, newEmail);
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
                                         value={"Informaticien"}
                                         columnId="titre_poste"
-                                        onChange={(columnId, newTitre) => {
-                                            if (newTitre) {
-                                                updateData(employee.id_employe, columnId, newTitre);
-                                            }
-                                        }}
+                                        onChange={(newNom) => handleCellUpdate(employee.id_employe, 'nom', newNom)}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <StatusCell
                                         status={employee.statut}
                                         statusOptions={EMPLOYEE_STATUSES}
-                                        onStatusChange={(newStatus) => updateStatus(employee.id_employe, newStatus)}
+                                        onChange={(newStatus) => handleCellUpdate(employee.id_employe, 'statut', newStatus)}
                                     />
                                 </Td>
                                 <Td borderColor={borderColor}>
