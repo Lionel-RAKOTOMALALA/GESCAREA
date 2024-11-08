@@ -1,32 +1,33 @@
-import React, { useState,useEffect } from 'react';
-import {  EMPLOYEE_STATUSES, EmployeeStore } from '../../../store/EmployeeStore';
+import React, { useState, useEffect } from 'react';
+import { EMPLOYEE_STATUSES, EmployeeStore } from '../../../store/EmployeeStore';
 import DateCell from '../TableConfig/DateCell';
 import EditableCell from '../TableConfig/EditableCell';
 import Filters from '../TableConfig/Filters';
 import Pagination from '../TableConfig/Pagination';
 import StatusCell from '../TableConfig/StatusCell';
 import { Box, Flex, Table, Thead, Tbody, Tr, Th, Td, useColorModeValue, Button } from '@chakra-ui/react';
-import { EditEmployeeModal } from '../../Modals/EditEmployeModal';
+import EditEmployeeModal from 'components/Modals/EditEmployeModal';
 import { ViewEmployeeModal } from '../../Modals/ViewEmployeeModal';
 import useFetchEmploye from 'hooks/employe.hook';
 import { useAuthStore } from 'store/store';
 import { getEmployeDetails } from 'helper/helper';
+import SupprConfirmModal from 'components/Modals/supprConfirmModal';
 
 
 const EmployeeTable = () => {
     // Utiliser useFetch pour récupérer les données des employés
     // Récupère apiData depuis le store Zustand pour le maintenir en état global
-// Appel de l'API pour les employés
-// Access the employeeData state and ensure it is an array
-useFetchEmploye('employes')
-const employeeData = useAuthStore((state) => state.employeeData) || [];
+    // Appel de l'API pour les employés
+    // Access the employeeData state and ensure it is an array
+    useFetchEmploye('employes')
+    const employeeData = useAuthStore((state) => state.employeeData) || [];
 
-// UseEffect to display employeeData in the console
-useEffect(() => {
-  console.log("Employé Data profile:", employeeData);
-}, [employeeData]);
+    // UseEffect to display employeeData in the console
+    useEffect(() => {
+        console.log("Employé Data profile:", employeeData);
+    }, [employeeData]);
 
-const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [employees, setEmployees] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -35,21 +36,36 @@ const [isLoading, setIsLoading] = useState(false);
     const [isViewModalOpen, setViewModalOpen] = useState(false);
     const [currentEmployee, setCurrentEmployee] = useState(null);
 
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
     const tableRowColor = useColorModeValue("#F7FAFC", "navy.900");
     const borderColor = useColorModeValue("gray.200", "gray.600");
     const textTableColor = useColorModeValue("gray.500", "white");
+    const [employeeToDelete, setEmployeeToDelete] = useState({ name: '', id: null });
 
 
 
-    const handleDelete = (id) => {
-        const confirmDelete = window.confirm(id);
-        if (confirmDelete) {
-            setEmployees(prev => prev.filter(emp => emp.id !== id));
+    const handleDelete = (employeeId, employeeName) => {
+        // Check if employeeName and employeeId are valid before setting
+        if (employeeId && employeeName) {
+            setEmployeeToDelete({ id: employeeId, name: employeeName });
+            setIsModalOpen(true); // Afficher le modal
+        } else {
+            console.error("Employee data is missing or invalid.");
         }
     };
 
-    const handleEdit = (employee) => {
-        setCurrentEmployee(employee);
+    const handleEdit = async (employeeId) => {
+        setIsLoading(true);  // Démarre le chargement
+        try {
+            const data = await getEmployeDetails(employeeId);  // Utilisation de la fonction helper
+            setCurrentEmployee(data);  // Stocke les données de l'employé dans l'état
+            setEditModalOpen(true);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données de l\'employé:', error);
+        } finally {
+            setIsLoading(false);  // Fin du chargement
+        }
     };
 
     const updateData = (rowId, columnId, newValue) => {
@@ -81,16 +97,16 @@ const [isLoading, setIsLoading] = useState(false);
     const handleView = async (employeeId) => {
         setIsLoading(true);  // Démarre le chargement
         try {
-          const data = await getEmployeDetails(employeeId);  // Utilisation de la fonction helper
-          setCurrentEmployee(data);  // Stocke les données de l'employé dans l'état
-          setViewModalOpen(true);  // Ouvre le modal
+            const data = await getEmployeDetails(employeeId);  // Utilisation de la fonction helper
+            setCurrentEmployee(data);  // Stocke les données de l'employé dans l'état
+            setViewModalOpen(true);  // Ouvre le modal
         } catch (error) {
-          console.error('Erreur lors de la récupération des données de l\'employé:', error);
+            console.error('Erreur lors de la récupération des données de l\'employé:', error);
         } finally {
-          setIsLoading(false);  // Fin du chargement
+            setIsLoading(false);  // Fin du chargement
         }
-      };
-    
+    };
+
 
 
 
@@ -99,7 +115,7 @@ const [isLoading, setIsLoading] = useState(false);
 
     return (
         <Box p={4}>
-            <Filters 
+            <Filters
                 columnFilters={columnFilters}
                 setColumnFilters={setColumnFilters}
                 filterPlaceholder="Search by name"
@@ -131,125 +147,125 @@ const [isLoading, setIsLoading] = useState(false);
                                     {employee.employe._id}
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' fontWeight='bold' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={employee.employe.nom} 
-                                        columnId="nom" 
+                                    <EditableCell
+                                        value={employee.employe.nom}
+                                        columnId="nom"
                                         onChange={(columnId, newNom) => {
                                             if (newNom) {
                                                 updateData(employee.id_employe, columnId, newNom);
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' fontWeight='bold' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={employee.employe.prenom} 
-                                        columnId="prenom" 
+                                    <EditableCell
+                                        value={employee.employe.prenom}
+                                        columnId="prenom"
                                         onChange={(columnId, newPrenom) => {
                                             if (newPrenom) {
                                                 updateData(employee.id_employe, columnId, newPrenom);
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <DateCell 
-                                        value={employee.employe.date_naissance} 
-                                        updateData={updateData} 
-                                        rowId={employee.id_employe} 
-                                        columnId="date_naissance" 
+                                    <DateCell
+                                        value={employee.employe.date_naissance}
+                                        updateData={updateData}
+                                        rowId={employee.id_employe}
+                                        columnId="date_naissance"
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={"16"} 
-                                        columnId="age" 
+                                    <EditableCell
+                                        value={"16"}
+                                        columnId="age"
                                         onChange={(columnId, newAge) => {
                                             if (newAge) {
                                                 updateData(employee.id_employe, columnId, parseInt(newAge, 10));
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={employee.employe.genre} 
-                                        columnId="genre" 
+                                    <EditableCell
+                                        value={employee.employe.genre}
+                                        columnId="genre"
                                         onChange={(columnId, newGenre) => {
                                             if (newGenre) {
                                                 updateData(employee.id_employe, columnId, newGenre);
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={employee.employe.situation_matrimoniale} 
-                                        columnId="situation_matrimoniale" 
+                                    <EditableCell
+                                        value={employee.employe.situation_matrimoniale}
+                                        columnId="situation_matrimoniale"
                                         onChange={(columnId, newSituation) => {
                                             if (newSituation) {
                                                 updateData(employee.id_employe, columnId, newSituation);
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={employee.employe.contact_personnel} 
-                                        columnId="contact_personnel" 
+                                    <EditableCell
+                                        value={employee.employe.contact_personnel}
+                                        columnId="contact_personnel"
                                         onChange={(columnId, newContact) => {
                                             if (newContact) {
                                                 updateData(employee.id_employe, columnId, newContact);
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={employee.employe.email} 
-                                        columnId="email" 
+                                    <EditableCell
+                                        value={employee.employe.email}
+                                        columnId="email"
                                         onChange={(columnId, newEmail) => {
                                             if (newEmail) {
                                                 updateData(employee.id_employe, columnId, newEmail);
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={"Informaticien"} 
-                                        columnId="titre_poste" 
+                                    <EditableCell
+                                        value={"Informaticien"}
+                                        columnId="titre_poste"
                                         onChange={(columnId, newTitre) => {
                                             if (newTitre) {
                                                 updateData(employee.id_employe, columnId, newTitre);
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <StatusCell 
-                                        status={employee.statut} 
+                                    <StatusCell
+                                        status={employee.statut}
                                         statusOptions={EMPLOYEE_STATUSES}
-                                        onStatusChange={(newStatus) => updateStatus(employee.id_employe, newStatus)} 
+                                        onStatusChange={(newStatus) => updateStatus(employee.id_employe, newStatus)}
                                     />
                                 </Td>
                                 <Td borderColor={borderColor}>
                                     <Flex gap={2}>
-                                        <Button 
-                                            colorScheme="blue" 
+                                        <Button
+                                            colorScheme="blue"
                                             onClick={() => handleView(employee.employe._id)}
                                         >
                                             Voir
                                         </Button>
-                                        <Button 
-                                            colorScheme="yellow" 
+                                        <Button
+                                            colorScheme="yellow"
                                             onClick={() => handleEdit(employee.employe._id)}
                                         >
                                             Éditer
                                         </Button>
-                                        <Button 
-                                            colorScheme="red" 
-                                            onClick={() => handleDelete(employee.employe._id)}
+                                        <Button
+                                            colorScheme="red"
+                                            onClick={() => handleDelete(employee.employe._id, employee.employe.username)}
                                         >
                                             Supprimer
                                         </Button>
@@ -261,17 +277,28 @@ const [isLoading, setIsLoading] = useState(false);
                 </Table>
             </Box>
 
-            <EditEmployeeModal 
-                isOpen={isEditModalOpen} 
-                onClose={handleModalClose} 
-                employee={currentEmployee} 
+            <EditEmployeeModal
+                isOpen={isEditModalOpen}
+                onClose={handleModalClose}
+                employee={currentEmployee}
                 setEmployees={setEmployees}
             />
-            <ViewEmployeeModal 
-                isOpen={isViewModalOpen} 
-                onClose={handleViewModalClose} 
+            <ViewEmployeeModal
+                isOpen={isViewModalOpen}
+                onClose={handleViewModalClose}
                 employee={currentEmployee}
             />
+            <SupprConfirmModal
+                isOpen={isModalOpen} // Afficher ou cacher le modal
+                onClose={() => setIsModalOpen(false)} // Fermer le modal
+                onConfirm={() => {
+                    // Handle the deletion logic here
+                    console.log(`Employee ${employeeToDelete?.name} deleted`);
+                    setIsModalOpen(false);
+                }} // Confirmation logic
+                employeeName={employeeToDelete?.name || 'N/A'} // Safely access name, defaulting to 'N/A'
+            />
+
         </Box>
     );
 };

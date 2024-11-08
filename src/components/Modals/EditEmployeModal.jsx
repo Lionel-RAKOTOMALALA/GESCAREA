@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState, useEffect } from 'react'
 import {
   Modal,
@@ -28,7 +26,6 @@ import {
 } from '@chakra-ui/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiUser, FiBriefcase, FiMapPin, FiAward, FiClipboard } from 'react-icons/fi'
-import useFetchEmploye from 'hooks/employe.hook'
 
 const MotionBox = motion(Box)
 const MotionInput = motion(Input)
@@ -59,56 +56,44 @@ const AnimatedFormControl = ({ children, ...props }) => {
   )
 }
 
-export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
-  
+export default function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
   const [step, setStep] = useState(1)
   const [employe, setEmploye] = useState({
-    nom: '',
-    prenom: '',
-    date_naissance: '',
-    email: '',
-    telephone: '',
-    adresse: '',
-    contact_flotte: '',
-    contact_personnel: '',
-    situation_matrimoniale: '',
-    genre: '',
-    age: '',
     username: '',
+    email: '',
+    prenom: '',
+    nom: '',
+    date_naissance: '',
+    age: '',
+    genre: '',
+    situation_matrimoniale: '',
+    contact_personnel: '',
+    contact_flotte: '',
+    adresse: '',
   })
 
   const [statut, setStatut] = useState({
-    structure: '',
-    indice: '',
-    grade: '',
-    corps: '',
-    categorie: '',
-    qualite: '',
     code_cadre: '',
-    status: '',
-    date_debut: '',
-    date_fin: null,
+    qualite: '',
+    categorie: '',
+    corps: '',
+    grade: '',
+    indice: '',
+    structure: '',
   })
 
   const [affectation, setAffectation] = useState({
-    id_departement: '',
-    date_affectation: '',
-    motif_depart_arrivee: '',
-    lieu_affectation: '',
-    date_prise_service: '',
     date_entree_admin: '',
+    date_prise_service: '',
+    lieu_affectation: '',
+    motif_depart_arrivee: '',
   })
 
   const [diplome, setDiplome] = useState({
-    id_diplome: '',
     cursus: '',
-    diplome: '',
-    date_obtention: '',
-    etablissement: '',
   })
 
   const [decision, setDecision] = useState({
-    id_decision: '',
     numero_decision: '',
     date_decision: '',
     commentaire: '',
@@ -137,51 +122,40 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
   useEffect(() => {
     if (employee) {
       setEmploye({
-        nom: employee.nom || '',
-        prenom: employee.prenom || '',
-        date_naissance: employee.date_naissance || '',
-        email: employee.email || '',
-        telephone: employee.telephone || '',
-        adresse: employee.adresse || '',
-        contact_flotte: employee.contact_flotte || '',
-        contact_personnel: employee.contact_personnel || '',
-        situation_matrimoniale: employee.situation_matrimoniale || '',
-        genre: employee.genre || '',
-        age: employee.age || '',
-        username: employee.username || '',
+        username: employee.employe?.username || '',
+        email: employee.employe?.email || '',
+        prenom: employee.employe?.prenom || '',
+        nom: employee.employe?.nom || '',
+        date_naissance: employee.employe?.date_naissance ? new Date(employee.employe.date_naissance).toISOString().split('T')[0] : '',
+        age: employee.employe?.age || '',
+        genre: employee.employe?.genre || '',
+        situation_matrimoniale: employee.employe?.situation_matrimoniale || '',
+        contact_personnel: employee.employe?.contact_personnel || '',
+        contact_flotte: employee.employe?.contact_flotte || '',
+        adresse: employee.employe?.adresse || '',
       })
       setStatut({
-        structure: employee.statut?.structure || '',
-        indice: employee.statut?.indice || '',
-        grade: employee.statut?.grade || '',
-        corps: employee.statut?.corps || '',
-        categorie: employee.statut?.categorie || '',
-        qualite: employee.statut?.qualite || '',
         code_cadre: employee.statut?.code_cadre || '',
-        status: employee.statut?.status || '',
-        date_debut: employee.statut?.date_debut || '',
-        date_fin: employee.statut?.date_fin || null,
+        qualite: employee.statut?.qualite || '',
+        categorie: employee.statut?.categorie || '',
+        corps: employee.statut?.corps || '',
+        grade: employee.statut?.grade || '',
+        indice: employee.statut?.indice || '',
+        structure: employee.statut?.structure || '',
       })
       setAffectation({
-        id_departement: employee.affectation?.id_departement || '',
-        date_affectation: employee.affectation?.date_affectation || '',
-        motif_depart_arrivee: employee.affectation?.motif_depart_arrivee || '',
+        date_entree_admin: employee.affectation?.date_entree_admin ? new Date(employee.affectation.date_entree_admin).toISOString().split('T')[0] : '',
+        date_prise_service: employee.affectation?.date_prise_service ? new Date(employee.affectation.date_prise_service).toISOString().split('T')[0] : '',
         lieu_affectation: employee.affectation?.lieu_affectation || '',
-        date_prise_service: employee.affectation?.date_prise_service || '',
-        date_entree_admin: employee.affectation?.date_entree_admin || '',
+        motif_depart_arrivee: employee.affectation?.motif_depart_arrivee || '',
       })
       setDiplome({
-        id_diplome: employee.diplome?.id_diplome || '',
-        cursus: employee.diplome?.cursus || '',
-        diplome: employee.diplome?.diplome || '',
-        date_obtention: employee.diplome?.date_obtention || '',
-        etablissement: employee.diplome?.etablissement || '',
+        cursus: employee.diplome?.[0]?.cursus || '',
       })
       setDecision({
-        id_decision: employee.decision?.id_decision || '',
-        numero_decision: employee.decision?.numero_decision || '',
-        date_decision: employee.decision?.date_decision || '',
-        commentaire: employee.decision?.commentaire || '',
+        numero_decision: employee.decision?.[0]?.numero_decision || '',
+        date_decision: employee.decision?.[0]?.date_decision ? new Date(employee.decision[0].date_decision).toISOString().split('T')[0] : '',
+        commentaire: employee.decision?.[0]?.commentaire || '',
       })
       setPoste({
         titre_poste: employee.poste?.titre_poste || '',
@@ -202,7 +176,7 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`http://localhost:8000/api/employes/${employee._id}`, {
+      const response = await fetch(`http://localhost:8000/api/employes/${employee.employe._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -283,10 +257,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Téléphone</FormLabel>
+                    <FormLabel>Nom d'utilisateur</FormLabel>
                     <MotionInput
-                      value={employe.telephone}
-                      onChange={(e) => setEmploye({ ...employe, telephone: e.target.value })}
+                      value={employe.username}
+                      onChange={(e) => setEmploye({ ...employe, username: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -295,10 +269,11 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Adresse</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <MotionInput
-                      value={employe.adresse}
-                      onChange={(e) => setEmploye({ ...employe, adresse: e.target.value })}
+                      type="email"
+                      value={employe.email}
+                      onChange={(e) => setEmploye({ ...employe, email: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -307,10 +282,11 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Contact flotte</FormLabel>
+                    <FormLabel>Date de naissance</FormLabel>
                     <MotionInput
-                      value={employe.contact_flotte}
-                      onChange={(e) => setEmploye({ ...employe, contact_flotte: e.target.value })}
+                      type="date"
+                      value={employe.date_naissance}
+                      onChange={(e) => setEmploye({ ...employe, date_naissance: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -319,14 +295,32 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Contact personnel</FormLabel>
+                    <FormLabel>Âge</FormLabel>
                     <MotionInput
-                      value={employe.contact_personnel}
-                      onChange={(e) => setEmploye({ ...employe, contact_personnel: e.target.value })}
+                      type="number"
+                      value={employe.age}
+                      onChange={(e) => setEmploye({ ...employe, age: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
                     />
+                  </AnimatedFormControl>
+                </GridItem>
+                <GridItem>
+                  <AnimatedFormControl>
+                    <FormLabel>Genre</FormLabel>
+                    <MotionSelect
+                      value={employe.genre}
+                      onChange={(e) => setEmploye({ ...employe, genre: e.target.value })}
+                      bg={inputBgColor}
+                      borderColor={inputBorderColor}
+                      _focus={{ borderColor: inputFocusBorderColor }}
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="M">Masculin</option>
+                      <option value="F">Féminin</option>
+                      <option value="Autre">Autre</option>
+                    </MotionSelect>
                   </AnimatedFormControl>
                 </GridItem>
                 <GridItem>
@@ -349,28 +343,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Genre</FormLabel>
-                    <MotionSelect
-                      value={employe.genre}
-                      onChange={(e) => setEmploye({ ...employe, genre: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    >
-                      <option value="">Sélectionner</option>
-                      <option value="M">Masculin</option>
-                      <option value="F">Féminin</option>
-                      <option value="Autre">Autre</option>
-                    </MotionSelect>
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Âge</FormLabel>
+                    <FormLabel>Contact personnel</FormLabel>
                     <MotionInput
-                      type="number"
-                      value={employe.age}
-                      onChange={(e) => setEmploye({ ...employe, age: e.target.value })}
+                      value={employe.contact_personnel}
+                      onChange={(e) => setEmploye({ ...employe, contact_personnel: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -379,10 +355,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Nom d'utilisateur</FormLabel>
+                    <FormLabel>Contact flotte</FormLabel>
                     <MotionInput
-                      value={employe.username}
-                      onChange={(e) => setEmploye({ ...employe, username: e.target.value })}
+                      value={employe.contact_flotte}
+                      onChange={(e) => setEmploye({ ...employe, contact_flotte: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -391,24 +367,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Date de naissance</FormLabel>
+                    <FormLabel>Adresse</FormLabel>
                     <MotionInput
-                      type="date"
-                      value={employe.date_naissance}
-                      onChange={(e) => setEmploye({ ...employe, date_naissance: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Email</FormLabel>
-                    <MotionInput
-                      type="email"
-                      value={employe.email}
-                      onChange={(e) => setEmploye({ ...employe, email: e.target.value })}
+                      value={employe.adresse}
+                      onChange={(e) => setEmploye({ ...employe, adresse: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -430,63 +392,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
               <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Structure</FormLabel>
+                    <FormLabel>Code Cadre</FormLabel>
                     <MotionInput
-                      value={statut.structure}
-                      onChange={(e) => setStatut({ ...statut, structure: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Indice</FormLabel>
-                    <MotionInput
-                      value={statut.indice}
-                      onChange={(e) => setStatut({ ...statut, indice: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Grade</FormLabel>
-                    <MotionSelect
-                      value={statut.grade}
-                      onChange={(e) => setStatut({ ...statut, grade: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    >
-                      <option value="">Sélectionner un grade</option>
-                      <option value="Junior">Junior</option>
-                      <option value="Intermédiaire">Intermédiaire</option>
-                      <option value="Senior">Senior</option>
-                    </MotionSelect>
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Corps</FormLabel>
-                    <MotionInput
-                      value={statut.corps}
-                      onChange={(e) => setStatut({ ...statut, corps: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Catégorie</FormLabel>
-                    <MotionInput
-                      value={statut.categorie}
-                      onChange={(e) => setStatut({ ...statut, categorie: e.target.value })}
+                      value={statut.code_cadre}
+                      onChange={(e) => setStatut({ ...statut, code_cadre: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -507,10 +416,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Code Cadre</FormLabel>
+                    <FormLabel>Catégorie</FormLabel>
                     <MotionInput
-                      value={statut.code_cadre}
-                      onChange={(e) => setStatut({ ...statut, code_cadre: e.target.value })}
+                      value={statut.categorie}
+                      onChange={(e) => setStatut({ ...statut, categorie: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -519,10 +428,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>Corps</FormLabel>
                     <MotionInput
-                      value={statut.status}
-                      onChange={(e) => setStatut({ ...statut, status: e.target.value })}
+                      value={statut.corps}
+                      onChange={(e) => setStatut({ ...statut, corps: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -531,11 +440,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Date de début</FormLabel>
+                    <FormLabel>Grade</FormLabel>
                     <MotionInput
-                      type="date"
-                      value={statut.date_debut}
-                      onChange={(e) => setStatut({ ...statut, date_debut: e.target.value })}
+                      value={statut.grade}
+                      onChange={(e) => setStatut({ ...statut, grade: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -544,11 +452,22 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Date de fin</FormLabel>
+                    <FormLabel>Indice</FormLabel>
                     <MotionInput
-                      type="date"
-                      value={statut.date_fin}
-                      onChange={(e) => setStatut({ ...statut, date_fin: e.target.value })}
+                      value={statut.indice}
+                      onChange={(e) => setStatut({ ...statut, indice: e.target.value })}
+                      bg={inputBgColor}
+                      borderColor={inputBorderColor}
+                      _focus={{ borderColor: inputFocusBorderColor }}
+                    />
+                  </AnimatedFormControl>
+                </GridItem>
+                <GridItem>
+                  <AnimatedFormControl>
+                    <FormLabel>Structure</FormLabel>
+                    <MotionInput
+                      value={statut.structure}
+                      onChange={(e) => setStatut({ ...statut, structure: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -570,47 +489,11 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
               <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>ID Département</FormLabel>
-                    <MotionInput
-                      value={affectation.id_departement}
-                      onChange={(e) => setAffectation({ ...affectation, id_departement: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Date d'affectation</FormLabel>
+                    <FormLabel>Date d'entrée admin</FormLabel>
                     <MotionInput
                       type="date"
-                      value={affectation.date_affectation}
-                      onChange={(e) => setAffectation({ ...affectation, date_affectation: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Motif départ/arrivée</FormLabel>
-                    <MotionInput
-                      value={affectation.motif_depart_arrivee}
-                      onChange={(e) => setAffectation({ ...affectation, motif_depart_arrivee: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Lieu d'affectation</FormLabel>
-                    <MotionInput
-                      value={affectation.lieu_affectation}
-                      onChange={(e) => setAffectation({ ...affectation, lieu_affectation: e.target.value })}
+                      value={affectation.date_entree_admin}
+                      onChange={(e) => setAffectation({ ...affectation, date_entree_admin: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -632,11 +515,22 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
                 </GridItem>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>Date d'entrée admin</FormLabel>
+                    <FormLabel>Lieu d'affectation</FormLabel>
                     <MotionInput
-                      type="date"
-                      value={affectation.date_entree_admin}
-                      onChange={(e) => setAffectation({ ...affectation, date_entree_admin: e.target.value })}
+                      value={affectation.lieu_affectation}
+                      onChange={(e) => setAffectation({ ...affectation, lieu_affectation: e.target.value })}
+                      bg={inputBgColor}
+                      borderColor={inputBorderColor}
+                      _focus={{ borderColor: inputFocusBorderColor }}
+                    />
+                  </AnimatedFormControl>
+                </GridItem>
+                <GridItem>
+                  <AnimatedFormControl>
+                    <FormLabel>Motif départ/arrivée</FormLabel>
+                    <MotionInput
+                      value={affectation.motif_depart_arrivee}
+                      onChange={(e) => setAffectation({ ...affectation, motif_depart_arrivee: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
@@ -658,71 +552,10 @@ export  function EditEmployeeModal({ isOpen, onClose, employee = {} }) {
               <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                 <GridItem>
                   <AnimatedFormControl>
-                    <FormLabel>ID Diplôme</FormLabel>
-                    <MotionInput
-                      value={diplome.id_diplome}
-                      onChange={(e) => setDiplome({ ...diplome, id_diplome: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
                     <FormLabel>Cursus</FormLabel>
                     <MotionInput
                       value={diplome.cursus}
                       onChange={(e) => setDiplome({ ...diplome, cursus: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Diplôme</FormLabel>
-                    <MotionInput
-                      value={diplome.diplome}
-                      onChange={(e) => setDiplome({ ...diplome, diplome: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Date d'obtention</FormLabel>
-                    <MotionInput
-                      type="date"
-                      value={diplome.date_obtention}
-                      onChange={(e) => setDiplome({ ...diplome, date_obtention: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>Établissement</FormLabel>
-                    <MotionInput
-                      value={diplome.etablissement}
-                      onChange={(e) => setDiplome({ ...diplome, etablissement: e.target.value })}
-                      bg={inputBgColor}
-                      borderColor={inputBorderColor}
-                      _focus={{ borderColor: inputFocusBorderColor }}
-                    />
-                  </AnimatedFormControl>
-                </GridItem>
-                <GridItem>
-                  <AnimatedFormControl>
-                    <FormLabel>ID Décision</FormLabel>
-                    <MotionInput
-                      value={decision.id_decision}
-                      onChange={(e) => setDecision({ ...decision, id_decision: e.target.value })}
                       bg={inputBgColor}
                       borderColor={inputBorderColor}
                       _focus={{ borderColor: inputFocusBorderColor }}
