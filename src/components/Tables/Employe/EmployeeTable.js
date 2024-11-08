@@ -10,6 +10,8 @@ import { EditEmployeeModal } from '../../Modals/EditEmployeModal';
 import { ViewEmployeeModal } from '../../Modals/ViewEmployeeModal';
 import useFetchEmploye from 'hooks/employe.hook';
 import { useAuthStore } from 'store/store';
+import { getEmployeDetails } from 'helper/helper';
+
 
 const EmployeeTable = () => {
     // Utiliser useFetch pour récupérer les données des employés
@@ -24,7 +26,7 @@ useEffect(() => {
   console.log("Employé Data profile:", employeeData);
 }, [employeeData]);
 
-
+const [isLoading, setIsLoading] = useState(false);
     const [employees, setEmployees] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -40,7 +42,7 @@ useEffect(() => {
 
 
     const handleDelete = (id) => {
-        const confirmDelete = window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?");
+        const confirmDelete = window.confirm(id);
         if (confirmDelete) {
             setEmployees(prev => prev.filter(emp => emp.id !== id));
         }
@@ -48,7 +50,6 @@ useEffect(() => {
 
     const handleEdit = (employee) => {
         setCurrentEmployee(employee);
-        setEditModalOpen(true);
     };
 
     const updateData = (rowId, columnId, newValue) => {
@@ -77,10 +78,19 @@ useEffect(() => {
         setCurrentEmployee(null);
     };
 
-    const handleView = (employee) => {
-        setCurrentEmployee(employee);
-        setViewModalOpen(true);
-    };
+    const handleView = async (employeeId) => {
+        setIsLoading(true);  // Démarre le chargement
+        try {
+          const data = await getEmployeDetails(employeeId);  // Utilisation de la fonction helper
+          setCurrentEmployee(data);  // Stocke les données de l'employé dans l'état
+          setViewModalOpen(true);  // Ouvre le modal
+        } catch (error) {
+          console.error('Erreur lors de la récupération des données de l\'employé:', error);
+        } finally {
+          setIsLoading(false);  // Fin du chargement
+        }
+      };
+    
 
 
 
@@ -223,34 +233,23 @@ useEffect(() => {
                                         onStatusChange={(newStatus) => updateStatus(employee.id_employe, newStatus)} 
                                     />
                                 </Td>
-                                <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell 
-                                        value={employee.affectation.lieu_affectation} 
-                                        columnId="lieu_affectation" 
-                                        onChange={(columnId, newLieu) => {
-                                            if (newLieu) {
-                                                updateData(employee.id_employe, columnId, newLieu);
-                                            }
-                                        }} 
-                                    />
-                                </Td>
                                 <Td borderColor={borderColor}>
                                     <Flex gap={2}>
                                         <Button 
                                             colorScheme="blue" 
-                                            onClick={() => handleView(employee)}
+                                            onClick={() => handleView(employee.employe._id)}
                                         >
                                             Voir
                                         </Button>
                                         <Button 
                                             colorScheme="yellow" 
-                                            onClick={() => handleEdit(employee)}
+                                            onClick={() => handleEdit(employee.employe._id)}
                                         >
                                             Éditer
                                         </Button>
                                         <Button 
                                             colorScheme="red" 
-                                            onClick={() => handleDelete(employee.id_employe)}
+                                            onClick={() => handleDelete(employee.employe._id)}
                                         >
                                             Supprimer
                                         </Button>

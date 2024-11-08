@@ -34,6 +34,8 @@ export const PhoneIcon = createIcon({
   ),
 });
 
+
+
 export const EmailIcon = createIcon({
   displayName: "EmailIcon",
   viewBox: "0 0 24 24",
@@ -47,6 +49,60 @@ export const EmailIcon = createIcon({
   ),
 });
 
+export const MapPinIcon = createIcon({
+  displayName: "MapPinIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g>
+      <path
+        d="M12 2C8.69 2 6 4.69 6 8c0 4.63 6 12 6 12s6-7.37 6-12c0-3.31-2.69-6-6-6zm0 9c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"
+        fill="#000000"
+      />
+    </g>
+  ),
+});
+
+
+export const UserIcon = createIcon({
+  displayName: "UserIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g>
+      <path
+        d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4s-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.33-8 4v2h16v-2c0-2.67-5.33-4-8-4z"
+        fill="#000000"
+      />
+    </g>
+  ),
+});
+
+
+export const BuildingIcon = createIcon({
+  displayName: "BuildingIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g>
+      <path
+        d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm9 12h4v-4h-4zm0-6h4V8h-4zm-6 6h4v-4H6zm0-6h4V8H6zm0 8h4v-4H6z"
+        fill="#000000"
+      />
+    </g>
+  ),
+});
+
+
+export const CurrencyIcon = createIcon({
+  displayName: "CurrencyIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g>
+      <path
+        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm2-5c0 1.66-1.34 3-3 3s-3-1.34-3-3h2c0 .55.45 1 1 1s1-.45 1-1c0-.55-.45-1-1-1s-1-.45-1-1c0-.55.45-1 1-1s1 .45 1 1c0 .55-.45 1-1 1h-2c0-1.66 1.34-3 3-3s3 1.34 3 3z"
+        fill="#000000"
+      />
+    </g>
+  ),
+});
 
 
 export const GraduationCapIcon = createIcon({

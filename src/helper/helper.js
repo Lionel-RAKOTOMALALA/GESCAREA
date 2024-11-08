@@ -36,7 +36,31 @@ export async function getUser({ username }) {
         return { error: "Password doesn't Match...!" };
     }
 }
+/** Helper to get employee details */
+export async function getEmployeDetails(employeId) {
+    try {
+        // Vérifier si le token est présent dans le localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error("Token d'authentification manquant");
+        }
 
+        // Faire une requête GET pour récupérer les détails de l'employé
+        const response = await axios.get(`/api/employes/${employeId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,  // Ajouter le token pour l'authentification
+            },
+        });
+
+        // Retourner les données obtenues
+        return Promise.resolve(response.data);
+    } catch (error) {
+        // Si une erreur survient, renvoyer un message d'erreur
+        return Promise.reject({
+            error: error.response ? error.response.data : error.message,
+        });
+    }
+}
 /** register user function */
 export async function registerUser(credentials) {
     try {
