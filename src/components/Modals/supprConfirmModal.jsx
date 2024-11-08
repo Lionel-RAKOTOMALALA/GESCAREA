@@ -18,6 +18,8 @@ import {
 } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { FiAlertTriangle } from 'react-icons/fi'
+import { supprimerEmploye } from '../../helper/helper' // Assurez-vous que l'import est correct pour votre chemin
+import useFetchEmploye from 'hooks/employe.hook'
 
 // Apply motion to ModalContent
 const MotionModalContent = motion(ModalContent)
@@ -26,10 +28,25 @@ const MotionHStack = motion(HStack)
 const MotionText = motion(Text)
 const MotionButton = motion(Button)
 
-export default function SupprConfirmModal({ isOpen, onClose, onConfirm, employeeName }) {
+export default function SupprConfirmModal({ isOpen, onClose, onConfirm, employeeName, employeeId }) {
   const bgColor = useColorModeValue('white', 'gray.800')
   const textColor = useColorModeValue('gray.800', 'white')
   const warningColor = useColorModeValue('red.500', 'red.300')
+
+  const handleConfirmDelete = async () => {
+    try {
+      // Appel à la fonction API pour supprimer l'employé
+      await supprimerEmploye(employeeId);
+      console.log(`Employee ${employeeName} deleted`);
+      
+      // Fermer le modal et exécuter la logique de confirmation supplémentaire si nécessaire
+      onConfirm();
+      onClose();
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'employé:", error);
+      // Afficher un message d'erreur à l'utilisateur ou ajouter une logique d'erreur ici
+    }
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
@@ -100,7 +117,7 @@ export default function SupprConfirmModal({ isOpen, onClose, onConfirm, employee
             </MotionButton>
             <MotionButton
               colorScheme="red"
-              onClick={onConfirm}
+              onClick={handleConfirmDelete}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6, duration: 0.3 }}

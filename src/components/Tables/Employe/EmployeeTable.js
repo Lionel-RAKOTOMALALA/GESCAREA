@@ -296,7 +296,8 @@ const EmployeeTable = () => {
                     console.log(`Employee ${employeeToDelete?.name} deleted`);
                     setIsModalOpen(false);
                 }} // Confirmation logic
-                employeeName={employeeToDelete?.name || 'N/A'} // Safely access name, defaulting to 'N/A'
+                employeeName={employeeToDelete?.name || 'N/A'} 
+                employeeId={employeeToDelete?.id || 'N/A'}
             />
 
         </Box>

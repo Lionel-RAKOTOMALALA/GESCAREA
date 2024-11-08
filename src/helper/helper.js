@@ -26,6 +26,27 @@ export async function authenticate(username) {
         return { error: "Username doesn't exist...!" };
     }
 }
+/** Helper to delete employee and related documents */
+export async function supprimerEmploye(employeId) {
+    try {
+        // Récupérer le token du localStorage
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error("Token d'authentification manquant");
+
+        // Appel API pour supprimer l'employé et ses données liées
+        const response = await axios.delete(`/api/employes/${employeId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}` // Ajout du token d'autorisation
+            }
+        });
+
+        // Renvoyer le message de succès ou confirmation
+        return Promise.resolve(response.data);
+    } catch (error) {
+        // Rejeter la promesse avec un message d'erreur
+        return Promise.reject({ error: error.response ? error.response.data : error.message });
+    }
+}
 
 /** get User details */
 export async function getUser({ username }) {
