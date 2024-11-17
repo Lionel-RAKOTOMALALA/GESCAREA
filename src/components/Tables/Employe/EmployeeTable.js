@@ -13,6 +13,8 @@ import { useAuthStore } from 'store/store';
 import { getEmployeDetails } from 'helper/helper';
 import SupprConfirmModal from 'components/Modals/supprConfirmModal';
 import toast from 'react-hot-toast';
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import EmployeePDFDocument from '../../ExportFormat/PDFfile';
 
 
 const EmployeeTable = () => {
@@ -36,6 +38,7 @@ const EmployeeTable = () => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isViewModalOpen, setViewModalOpen] = useState(false);
     const [currentEmployee, setCurrentEmployee] = useState(null);
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -53,6 +56,17 @@ const EmployeeTable = () => {
             console.error("Employee data is missing or invalid.");
         }
     };
+
+        // Fonction pour mettre à jour currentEmployee avec l'ID de l'employé sélectionné
+        const handleSetCurrentEmployee = (employeeId) => {
+            // Trouver l'employé avec l'ID
+            const employee = employeeData.find(emp => emp.employe._id === employeeId);
+            setSelectedEmployee(employee);
+            console.log(selectedEmployee);
+            
+        };
+
+
 
     const handleEdit = async (employeeId) => {
         setIsLoading(true);  // Démarre le chargement
@@ -222,58 +236,83 @@ const EmployeeTable = () => {
                                         employeeId={employee.employe._id}
                                     />
                                 </Td>
-                                <Td>
+                                <Td borderColor={borderColor}>
+                                    <Flex gap={2}>
                                     <Button
-                                        colorScheme="blue"
-                                        onClick={() => handleView(employee.employe._id)}
+                                    colorScheme="blue"
+                                    onClick={() => handleSetCurrentEmployee(employee.employe._id)}
+                                >
+                                    Générer PDF
+                                </Button>
+
+                                {/* Lien pour télécharger le PDF du salarié sélectionné */}
+                                {selectedEmployee && selectedEmployee.employe._id === employee.employe._id && (
+                                    <PDFDownloadLink
+                                        document={<EmployeePDFDocument employees={selectedEmployee} />}
+                                        fileName={`${selectedEmployee.employe.nom}_${selectedEmployee.employe.prenom}.pdf`}
+                                        style={{
+                                            textDecoration: 'none',
+                                            padding: '10px',
+                                            color: 'white',
+                                            backgroundColor: '#007ACC',
+                                            borderRadius: '4px',
+                                        }}
                                     >
-                                        Voir
-                                    </Button>
-                                    <Button
-                                        colorScheme="orange"
-                                        onClick={() => handleEdit(employee.employe._id)}
-                                    >
-                                        Modifier
-                                    </Button>
-                                    <Button
-                                        colorScheme="red"
-                                        onClick={() => handleDelete(employee.employe._id, employee.employe.nom)}
-                                    >
-                                        Supprimer
-                                    </Button>
+                                        {({ loading }) => 
+                                            loading ? 'Création du PDF...' : 'Télécharger le PDF'
+                                        }
+                                    </PDFDownloadLink>
+                                )}
+
+                                        <Button
+                                            colorScheme="blue"
+                                            onClick={() => handleView(employee.employe._id)}
+                                        >
+                                            Voir
+                                        </Button>
+                                        <Button
+                                            colorScheme="yellow"
+                                            onClick={() => handleEdit(employee.employe._id)}
+                                        >
+                                            Éditer
+                                        </Button>
+                                        <Button
+                                            colorScheme="red"
+                                            onClick={() => handleDelete(employee.employe._id, employee.employe.username)}
+                                        >
+                                            Supprimer
+                                        </Button>
+                                    </Flex>
                                 </Td>
                             </Tr>
                         ))}
                     </Tbody>
                 </Table>
             </Box>
-            <Pagination
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                totalItems={employeeData.length}
-                rowsPerPage={rowsPerPage}
+
+            <EditEmployeeModal
+                isOpen={isEditModalOpen}
+                onClose={handleModalClose}
+                employee={currentEmployee}
+                setEmployees={setEmployees}
             />
-            {isEditModalOpen && (
-                <EditEmployeeModal
-                    isOpen={isEditModalOpen}
-                    onClose={handleModalClose}
-                    currentEmployee={currentEmployee}
-                />
-            )}
-            {isViewModalOpen && (
-                <ViewEmployeeModal
-                    isOpen={isViewModalOpen}
-                    onClose={handleViewModalClose}
-                    currentEmployee={currentEmployee}
-                />
-            )}
-            {isModalOpen && (
-                <SupprConfirmModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    employeeToDelete={employeeToDelete}
-                />
-            )}
+            <ViewEmployeeModal
+                isOpen={isViewModalOpen}
+                onClose={handleViewModalClose}
+                employee={currentEmployee}
+            />
+            <SupprConfirmModal
+                isOpen={isModalOpen} // Afficher ou cacher le modal
+                onClose={() => setIsModalOpen(false)} // Fermer le modal
+                onConfirm={() => {
+                    // Handle the deletion logic here
+                    console.log(`Employee ${employeeToDelete?.name} deleted`);
+                    setIsModalOpen(false);
+                }} // Confirmation logic
+                employeeName={employeeToDelete?.name || 'N/A'} 
+                employeeId={employeeToDelete?.id || 'N/A'}
+            />
+
         </Box>
     );
 };

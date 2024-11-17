@@ -14,6 +14,7 @@
 		"@fontsource/open-sans": "^5.1.0",
 		"@fontsource/raleway": "^5.1.0",
 		"@fontsource/roboto": "^5.1.0",
+		"@react-pdf/renderer": "^4.0.0",
 		"@tanstack/react-table": "^8.20.5",
 		"ajv": "^8.17.1",
 		"apexcharts": "^3.54.1",
