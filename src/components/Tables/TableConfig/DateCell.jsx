@@ -1,35 +1,31 @@
-import { Input } from "@chakra-ui/react"; // Importation du composant Input de Chakra UI
-import { useEffect, useState } from "react"; // Importation des hooks useEffect et useState de React
+import React, { useState } from 'react';
 
-// Composant pour afficher une cellule de date
-const DateCell = ({ value, updateData, rowId, columnId }) => {
-    // État local pour stocker la valeur de la date
-    const [date, setDate] = useState(value);
+const DateCell = ({ value, columnId, onBlur }) => {
+    // Convertir la date en format ISO pour l'affichage initial
+    const [editValue, setEditValue] = useState(
+        value ? new Date(value).toISOString().split('T')[0] : ''
+    );
 
-    // Fonction appelée lorsque l'input perd le focus (onBlur)
-    const onBlur = () => {
-        const newDate = new Date(date);
-        updateData(rowId, columnId, newDate); // Met à jour uniquement la cellule avec l'ID concerné
+    const handleBlur = () => {
+        if (onBlur) {
+            onBlur(editValue); // Appelle la fonction onBlur lorsque l'utilisateur quitte le champ
+        }
     };
 
-    // Synchronise la valeur de la date initiale avec la valeur locale lorsque value change
-    useEffect(() => {
-        setDate(value); // Met à jour l'état local si la valeur initiale change
-    }, [value]);
-
     return (
-        <Input
-            type="date" // Type de champ date
-            value={date} // La valeur de l'input est liée à l'état local
-            onChange={(e) => setDate(e.target.value)} // Met à jour l'état local lors de la saisie
-            onBlur={onBlur} // Appelle onBlur lorsque l'input perd le focus
-            size="sm" // Taille du champ de saisie
-            w="85%" // Largeur du champ de saisie
-            overflow="hidden" // Cache le débordement
-            textOverflow="ellipsis" // Affiche des points de suspension si le texte déborde
-            whiteSpace="nowrap" // Empêche le texte de se diviser sur plusieurs lignes
+        <input
+            type="date" // Utilisation de l'input date
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)} // Met à jour la valeur localement
+            onBlur={handleBlur} // Déclenche la mise à jour lors du blur
+             // Appelle onBlur lorsque l'input perd le focus
+             size="sm" // Taille du champ de saisie
+             w="85%" // Largeur du champ de saisie
+             overflow="hidden" // Cache le débordement
+             textOverflow="ellipsis" // Affiche des points de suspension si le texte déborde
+             whiteSpace="nowrap"
         />
     );
 };
 
-export default DateCell; // Exporte le composant DateCell
+export default DateCell;

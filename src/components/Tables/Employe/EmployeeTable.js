@@ -15,6 +15,9 @@ import SupprConfirmModal from 'components/Modals/supprConfirmModal';
 import toast from 'react-hot-toast';
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import EmployeePDFDocument from '../../ExportFormat/PDFfile';
+import moment from 'moment';
+import 'moment/locale/fr'; // Optionnel : pour afficher les dates en français
+
 
 
 const EmployeeTable = () => {
@@ -24,6 +27,7 @@ const EmployeeTable = () => {
     // Access the employeeData state and ensure it is an array
     useFetchEmploye('employes');
     const employeeData = useAuthStore((state) => state.employeeData) || [];
+    moment.locale('fr');
 
     // UseEffect to display employeeData in the console
     useEffect(() => {
@@ -46,6 +50,17 @@ const EmployeeTable = () => {
     const borderColor = useColorModeValue("gray.200", "gray.600");
     const textTableColor = useColorModeValue("gray.500", "white");
     const [employeeToDelete, setEmployeeToDelete] = useState({ name: '', id: null });
+    const [pdfGenerationState, setPdfGenerationState] = useState({});
+
+ 
+    const handlePDFGeneration = (employeeId) => {
+        setPdfGenerationState(prev => ({ ...prev, [employeeId]: true }));
+      };
+    
+      const handlePDFGenerated = (employeeId) => {
+        setPdfGenerationState(prev => ({ ...prev, [employeeId]: false }));
+      };
+    
 
     const handleDelete = (employeeId, employeeName) => {
         // Check if employeeName and employeeId are valid before setting
@@ -62,7 +77,7 @@ const EmployeeTable = () => {
             // Trouver l'employé avec l'ID
             const employee = employeeData.find(emp => emp.employe._id === employeeId);
             setSelectedEmployee(employee);
-            console.log(selectedEmployee);
+            console.log(employee);
             
         };
 
@@ -180,12 +195,19 @@ const EmployeeTable = () => {
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <DateCell
-                                        value={employee.employe.date_naissance}
-                                        rowId={employee.id_employe}
-                                        columnId="date_naissance"
-                                        onBlur={(newDate) => handleCellUpdate(employee.employe._id, 'date_naissance', newDate)}
-                                    />
+                                   <DateCell
+  value={moment(employee.employe.date_naissance).format('YYYY-MM-DD')} // Utilisez le format ISO pour la modification
+  rowId={employee.id_employe}
+  columnId="date_naissance"
+  onBlur={(newDate) =>
+    handleCellUpdate(
+      employee.employe._id,
+      'date_naissance',
+      moment(newDate).format('YYYY-MM-DD') // Reformatage pour la base de données
+    )
+  }
+/>
+
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
@@ -195,12 +217,13 @@ const EmployeeTable = () => {
                                     />
                                 </Td>
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
-                                    <EditableCell
-                                        value={employee.employe.genre}
-                                        columnId="genre"
-                                        onBlur={(newGenre) => handleCellUpdate(employee.employe._id, 'genre', newGenre)}
-                                    />
-                                </Td>
+    <EditableCell
+        value={employee.employe.genre === 'F' ? 'Femme' : employee.employe.genre === 'M' ? 'Homme' : employee.employe.genre}
+        columnId="genre"
+        onBlur={(newGenre) => handleCellUpdate(employee.employe._id, 'genre', newGenre)}
+    />
+</Td>
+
                                 <Td color={textTableColor} fontSize='sm' borderColor={borderColor}>
                                     <EditableCell
                                         value={employee.employe.situation_matrimoniale}
@@ -236,34 +259,28 @@ const EmployeeTable = () => {
                                         employeeId={employee.employe._id}
                                     />
                                 </Td>
-                                <Td borderColor={borderColor}>
-                                    <Flex gap={2}>
-                                    <Button
-                                    colorScheme="blue"
-                                    onClick={() => handleSetCurrentEmployee(employee.employe._id)}
-                                >
-                                    Générer PDF
-                                </Button>
-
-                                {/* Lien pour télécharger le PDF du salarié sélectionné */}
-                                {selectedEmployee && selectedEmployee.employe._id === employee.employe._id && (
-                                    <PDFDownloadLink
-                                        document={<EmployeePDFDocument employees={selectedEmployee} />}
-                                        fileName={`${selectedEmployee.employe.nom}_${selectedEmployee.employe.prenom}.pdf`}
-                                        style={{
-                                            textDecoration: 'none',
-                                            padding: '10px',
-                                            color: 'white',
-                                            backgroundColor: '#007ACC',
-                                            borderRadius: '4px',
-                                        }}
-                                    >
-                                        {({ loading }) => 
-                                            loading ? 'Création du PDF...' : 'Télécharger le PDF'
-                                        }
-                                    </PDFDownloadLink>
-                                )}
-
+                                    <Td borderColor={borderColor}>
+      <Flex gap={2}>
+        <PDFDownloadLink
+          document={<EmployeePDFDocument employees={employee} />}
+          fileName={`${employee.employe.nom}_${employee.employe.prenom}.pdf`}
+        >
+          {({ blob, url, loading, error }) => (
+            <Button
+              colorScheme="blue"
+              isLoading={loading || pdfGenerationState[employee.employe._id]}
+              onClick={() => handlePDFGeneration(employee.employe._id)}
+              onMouseLeave={() => {
+                if (blob) {
+                  handlePDFGenerated(employee.employe._id);
+                }
+              }}
+            >
+              {loading || pdfGenerationState[employee.employe._id] ? 'Génération PDF...' : 'Générer PDF'}
+            </Button>
+          )}
+        </PDFDownloadLink>
+        
                                         <Button
                                             colorScheme="blue"
                                             onClick={() => handleView(employee.employe._id)}
